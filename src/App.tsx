@@ -7,12 +7,13 @@ import { TodoList } from './components/TodoList';
 import { TodoHeader } from './components/TodoHeader';
 import { Todo } from './types/Todo';
 import { Filter } from './types/Filter';
+import { ErrorMassage } from './types/ErrorMassage';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todoTitle, setTodoTitle] = useState<string>('');
   const [filter, setFilter] = useState<Filter>(Filter.all);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>(ErrorMassage.reset);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingTodoId, setLoadingTodoId] = useState<number | null>(null);
 
@@ -21,7 +22,7 @@ export const App: React.FC = () => {
     getTodos()
       .then(setTodos)
       .catch(() => {
-        setErrorMessage('Unable to load todos');
+        setErrorMessage(ErrorMassage.load);
       })
       .finally(() => {
         setIsLoading(false);
@@ -31,7 +32,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (errorMessage) {
       const timer = setTimeout(() => {
-        setErrorMessage('');
+        setErrorMessage(ErrorMassage.reset);
       }, 3000);
 
       return () => clearTimeout(timer);
@@ -61,7 +62,7 @@ export const App: React.FC = () => {
         return prevTodos.map(todo => (todo.id === id ? updatedTodo : todo));
       });
     } catch (error) {
-      setErrorMessage('Unable to update a todo');
+      setErrorMessage(ErrorMassage.update);
     } finally {
       setLoadingTodoId(null);
     }
@@ -72,7 +73,7 @@ export const App: React.FC = () => {
   };
 
   const handleCloseError = () => {
-    setErrorMessage('');
+    setErrorMessage(ErrorMassage.reset);
   };
 
   const handleAddingStart = () => {
