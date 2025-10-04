@@ -24,7 +24,6 @@ export const TodoHeader: React.FC<Props> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Перевіряємо, чи не пуста назва
     if (!todoTitle.trim()) {
       onError('Title should not be empty');
 
@@ -39,10 +38,8 @@ export const TodoHeader: React.FC<Props> = ({
         completed: false,
       });
 
-      // Оновлюємо список тудушок
       onTodoAdded(newTodo);
 
-      // Очищуємо поле
       setTodoTitle('');
     } catch (error) {
       onError('Unable to add a todo');
@@ -53,14 +50,12 @@ export const TodoHeader: React.FC<Props> = ({
 
   return (
     <header className="todoapp__header">
-      {/* this button should have `active` class only if all todos are completed */}
       <button
         type="button"
         className="todoapp__toggle-all"
         data-cy="ToggleAllButton"
       />
 
-      {/* Add a todo on form submit */}
       <form onSubmit={handleSubmit}>
         <input
           data-cy="NewTodoField"

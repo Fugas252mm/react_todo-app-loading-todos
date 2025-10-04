@@ -25,7 +25,6 @@ export const TodoList: React.FC<Props> = ({
             />
           );
         })}
-        {/* Hardcoded examples можна залишити для довідки */}
       </section>
     </>
   );

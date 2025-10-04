@@ -1,16 +1,17 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { UserWarning } from './UserWarning';
 import { getTodos, updateTodo, USER_ID } from './api/todos';
 import { TodoList } from './components/TodoList';
 import { TodoHeader } from './components/TodoHeader';
 import { Todo } from './types/Todo';
+import { Filter } from './types/Filter';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todoTitle, setTodoTitle] = useState<string>('');
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [filter, setFilter] = useState<Filter>(Filter.all);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingTodoId, setLoadingTodoId] = useState<number | null>(null);
@@ -37,7 +38,7 @@ export const App: React.FC = () => {
     }
   }, [errorMessage]);
 
-  const getFilteredTodos = () => {
+  const getFilteredTodos = useMemo(() => {
     switch (filter) {
       case 'active':
         return todos.filter(todo => !todo.completed);
@@ -46,7 +47,7 @@ export const App: React.FC = () => {
       default:
         return todos;
     }
-  };
+  }, [todos, filter]);
 
   const handleTodoAdded = (newTodo: Todo) => {
     setTodos(prevTodos => [...prevTodos, newTodo]);
@@ -101,19 +102,17 @@ export const App: React.FC = () => {
           isAdding={isLoading}
         />
         <TodoList
-          todos={getFilteredTodos()}
+          todos={getFilteredTodos}
           onToggleTodo={handleToggleTodo}
           loadingTodoId={loadingTodoId}
         />
 
-        {/* Hide the footer if there are no todos */}
         {todos.length > 0 && (
           <footer className="todoapp__footer" data-cy="Footer">
             <span className="todo-count" data-cy="TodosCounter">
               {todos.filter(todo => !todo.completed).length} items left
             </span>
 
-            {/* Active link should have the 'selected' class */}
             <nav className="filter" data-cy="Filter">
               <a
                 href="#/"
@@ -121,7 +120,7 @@ export const App: React.FC = () => {
                 data-cy="FilterLinkAll"
                 onClick={e => {
                   e.preventDefault();
-                  setFilter('all');
+                  setFilter(Filter.all);
                 }}
               >
                 All
@@ -133,7 +132,7 @@ export const App: React.FC = () => {
                 data-cy="FilterLinkActive"
                 onClick={e => {
                   e.preventDefault();
-                  setFilter('active');
+                  setFilter(Filter.active);
                 }}
               >
                 Active
@@ -145,14 +144,13 @@ export const App: React.FC = () => {
                 data-cy="FilterLinkCompleted"
                 onClick={e => {
                   e.preventDefault();
-                  setFilter('completed');
+                  setFilter(Filter.completed);
                 }}
               >
                 Completed
               </a>
             </nav>
 
-            {/* this button should be disabled if there are no completed todos */}
             <button
               type="button"
               className="todoapp__clear-completed"
@@ -164,8 +162,6 @@ export const App: React.FC = () => {
         )}
       </div>
 
-      {/* DON'T use conditional rendering to hide the notification */}
-      {/* Add the 'hidden' class to hide the message smoothly */}
       <div
         data-cy="ErrorNotification"
         className={`notification is-danger is-light has-text-weight-normal ${errorMessage ? '' : 'hidden'}`}
@@ -176,7 +172,6 @@ export const App: React.FC = () => {
           className="delete"
           onClick={handleCloseError}
         />
-        {/* show only one message at a time */}
         {errorMessage}
       </div>
     </div>
